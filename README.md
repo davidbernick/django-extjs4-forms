@@ -61,8 +61,24 @@ The stuff in the src directory can be manually manipulated or you can use setup.
 			            ,scope:this
 			            ,submitSuccess: function(){
 			            	//stuff to put on success if this is a window or something like that
+			            	//by default it just displays a dialog box for confirmation. overriding is a good thing.
 			            }
 			             ,callback:function(form) {
 			                form.doLayout();
 			             }
 			       })    
+
+Some fun calls in DjangoForm
+======
+submitSuccess:function() {} -- by default, displays a message box as confirmation.
+submitError:function() {} -- by default, displays message box with error.
+
+Some fun python calls for your views
+======
+These are things you should return instead of the usual render:
+
+JsonResponse(JSONserialise(RoleForm().as_extjsfields())) - spits out a form (RoleForm()) as extjs elements. Usually for rendering the form.
+
+JsonError(RoleForm(request.POST).html_errorlist()) - spits out the form with the errors built-in. This probably needs to be redone to spit out errors right into the window.
+
+JsonResponse(JSONserialise({'success':True,'messages': [{'message':'OK'}]}) ) - success. 'messages' is ignored if you're overriding submitSuccess.

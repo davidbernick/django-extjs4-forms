@@ -130,7 +130,7 @@ Ext.define('Ext.ux.django.DjangoForm',{
 	
 	}
 	,invalid:function() {
-		//    console.log('invalid: ', this.getForm().getValues());
+		console.log('invalid: ', this.getForm().getValues());
 		Ext.Msg.show({
 			title:'Error',
 			msg: 'Error',
