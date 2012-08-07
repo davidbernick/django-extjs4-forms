@@ -51,13 +51,13 @@ def getFieldConfig(field_name, django_field, value = None):
 	field_class_name = ofield.__class__.__name__ 
 	if not isinstance(ofield, forms.Field):
 		form_field = ofield.formfield()
-		
+	
 	config = {}
 	
 	if value:
 		config['value'] = value
-	elif hasattr(ofield, 'initial'):
-		config['value'] = ofield.initial
+#	elif hasattr(ofield, 'initial'):
+#		config['value'] = ofield.initial
 
 	
 	config['name'] = u'%s' % field_name
@@ -129,6 +129,7 @@ def getFieldConfig(field_name, django_field, value = None):
 	# textfield
 	elif field_class_name in ['CharField', 'TextInput', 'Textarea']:
 		config['xtype'] = 'textfield'
+		#config['value'] = ofield.initial		
 		if hasattr(ofield, 'widget'):
 			if isinstance(ofield.widget, forms.widgets.PasswordInput):
 				config['inputType'] = 'password'
@@ -243,8 +244,7 @@ class ExtJsForm(object):
 		.add a as_extjs method to forms.Form or forms.ModelForm; this method returns a formpanel json config, with all fields, buttons and logic
 		.add a as_extjsfields method that returns only the field list. useful if you want to customise the form layout
 		.add a html_errorlist to return form validations error for an extjs window
-	"""
-	 
+	""" 
 	
 	@classmethod
 	def addto(self, cls):
@@ -278,7 +278,6 @@ class ExtJsForm(object):
 	@staticmethod
 	def as_extjsfields(self, excludes = []):
 			ext_fields = []
-			
 			if getattr(self, 'intro', None):
 				ext_fields.append({'style':'padding:5px', 'html':self.intro})
 			
@@ -289,17 +288,17 @@ class ExtJsForm(object):
 			# decimal : max_digits, decimal_places, negative
 			# number formatting
 
-			
-			for field in self.fields:
-				if field in excludes: continue
-				ofield = self.fields[field]
-
-				value = getattr(self, 'instance', None) and getattr(self.instance, field) or None
+			for name,field in self.fields.items():
+				if name in excludes: continue
+				ofield = field
+				
+				value = getattr(self, 'instance', None) and getattr(self.instance, name) or None
 				if value and ofield.__class__.__name__ == 'ModelChoiceField':
 						value = getattr(self.instance, field).pk
+				else:
+					value = self.initial.get(name, self.initial)		
 						
-				extfield = getFieldConfig(field, ofield, value)
-				#print 'getFieldConfig', extfield
+				extfield = getFieldConfig(name, ofield, value)
 				
 				ext_fields.append(extfield)   
 				
