@@ -29,13 +29,14 @@ The stuff in the src directory can be manually manipulated or you can use setup.
         email = forms.EmailField(label='your email', initial='test@revolunet.com')
         message = forms.CharField(label='your message', widget = forms.widgets.Textarea(attrs={'cols':15, 'rows':5}))
 
-    ExtJsForm.addto(ContactForm)        # new methods added to the form
             
     # the views.py
     def contact_form(request, path = None):
+    	cform = ContactForm
+    	ExtJsForm.addto(cform)        # new methods added to the form
         if request.method == 'POST':
             # handle form submission
-            form = ContactForm(request.POST)
+            form = cform(request.POST)
             if not form.is_valid():
                 return utils.JsonError(form.html_errorlist())
             else:
@@ -47,7 +48,7 @@ The stuff in the src directory can be manually manipulated or you can use setup.
                 }) )
         else:
             # handle form display
-            form = ContactForm()
+            form = cform(initial={'name':request.user})
             return utils.JsonResponse(utils.JSONserialise(form.as_extjsfields()))
             
 
