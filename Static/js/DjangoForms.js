@@ -1,10 +1,33 @@
 //dynamic load of a server side form
 Ext.ns('Ext.ux.django');
 
+Ext.ux.django.ghostbox = function(){
+    var msgCt;
+
+    function createBox(t, s){
+       return '<div class="msg"><h3>' + t + '</h3><p>' + s + '</p></div>';
+    }
+    return {
+        msg : function(title, format){
+            if(!msgCt){
+                msgCt = Ext.core.DomHelper.insertFirst(document.body, {id:'msg-div'}, true);
+            }
+            var s = Ext.String.format.apply(String, Array.prototype.slice.call(arguments, 1));
+            var m = Ext.core.DomHelper.append(msgCt, createBox(title, s), true);
+            m.hide();
+            m.slideIn('t').ghost("t", { delay: 1000, remove: true});
+        },
+
+        init : function(){
+        }
+    };
+}();
+
 Ext.define('Ext.ux.django.DjangoForm',{
 	extend:'Ext.FormPanel',
 	alias:'widget.DjangoForm',
 	url:null
+	,submiturl:null
 	,baseParamsLoad:{'dataType':'json'}
 	,callback:null
 	,scope:null
@@ -96,24 +119,26 @@ Ext.define('Ext.ux.django.DjangoForm',{
 	,submitSuccess:function() {
 		this.fireEvent('submitSuccess');
 		if (this.showSuccessMessage) {
-			Ext.Msg.show({
+			Ext.ux.django.ghostbox.msg('Success','Your form has been submitted successfully');
+/*			Ext.Msg.show({
 				title:'Succes',
 				msg: this.showSuccessMessage,
 				buttons: Ext.Msg.OK,               
 				icon: Ext.MessageBox.INFO 
 			});
-		}
+*/		}
 	}
 	,submitError:function(msg) {
 	
 		this.fireEvent('submitError', msg);
-		Ext.Msg.show({
+		Ext.ux.django.ghostbox.msg('Fail',msg);
+/*		Ext.Msg.show({
 			title:'Error',
 			msg: '<br>' + msg + '<br>',
 			buttons: Ext.Msg.OK,               
 			icon: Ext.MessageBox.WARNING 
 		});
-	}
+*/	}
 	
 	,validResponse:function(form, action) {
 		for (btn in this.buttons) {
@@ -129,15 +154,17 @@ Ext.define('Ext.ux.django.DjangoForm',{
 		}
 	
 	}
-	,invalid:function() {
-		console.log('invalid: ', this.getForm().getValues());
-		Ext.Msg.show({
+	,invalid:function(msg) {
+		//console.log('invalid: ', this.getForm().getValues());
+		Ext.ux.django.ghostbox.msg('Fail',msg);
+
+		/*		Ext.Msg.show({
 			title:'Error',
 			msg: 'Error',
 			buttons: Ext.Msg.OK,               
 			icon: Ext.MessageBox.WARNING 
 		});
-	}
+*/	}
 	,resetForm:function() {
 		console.log('resetForm');
 		this.getForm().reset();
@@ -145,13 +172,22 @@ Ext.define('Ext.ux.django.DjangoForm',{
 	
 	,submitForm:function() {
 		//console.log('submitForm');
+		var sendurl = null;
+		if (!submiturl){
+			sendurl = this.url;
+		} else {
+			sendurl = this.submiturl;
+		}
+		
 		if (this.getForm().isValid()) {
 			for (btn in this.buttons) {
 				if (this.buttons[btn].name == 'submit') {
 					this.buttons[btn].disable();
 				}
 			}
-			this.getForm().submit({scope:this, 
+			this.getForm().submit({
+				scope:this,
+				url: sendurl,
 				success:this.validResponse,
 				failure:this.validResponse,
 				params : {'dataType' : 'json'},
@@ -160,12 +196,18 @@ Ext.define('Ext.ux.django.DjangoForm',{
 				    },
 			});
 		} else {
-			// console.log('invalid form!');
-			// var items = this.getForm().items.items;
-			// for (f in items) {
-			// console.log(f, items[f], items[f].isValid());
-			// }
-			this.invalid()
+			var errorlist = "";
+			this.getForm().getFields().each(function(field) {
+				var fieldError = field.getErrors();
+				if (fieldError.length>0){
+					errorlist=errorlist+field.name+":";
+					for(var i=0;i<fieldError.length;i++){
+						errorlist = errorlist+fieldError[i]+"<BR>";												
+					}
+					errorlist = errorlist+"<BR>";
+				}
+			});
+			this.invalid(errorlist);
 		}
 	}                      
 
