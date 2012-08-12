@@ -173,7 +173,7 @@ Ext.define('Ext.ux.django.DjangoForm',{
 	,submitForm:function() {
 		//console.log('submitForm');
 		var sendurl = null;
-		if (!submiturl){
+		if (this.submiturl==null){
 			sendurl = this.url;
 		} else {
 			sendurl = this.submiturl;
