@@ -116,10 +116,11 @@ Ext.define('Ext.ux.django.DjangoForm',{
 
 
 	}
-	,submitSuccess:function() {
-		this.fireEvent('submitSuccess');
+	,submitSuccess:function(result) {
+		this.fireEvent('submitSuccess',result);
 		if (this.showSuccessMessage) {
-			Ext.ux.django.ghostbox.msg('Success','Your form has been submitted successfully');
+			//Ext.ux.django.ghostbox.msg('Success','Your form has been submitted successfully');
+			Ext.ux.django.ghostbox.msg('Success',result);
 /*			Ext.Msg.show({
 				title:'Succes',
 				msg: this.showSuccessMessage,
@@ -146,7 +147,8 @@ Ext.define('Ext.ux.django.DjangoForm',{
 			if (butt.name == 'submit') butt.enable();
 		}
 		if (action && action.result && action.result.success) {
-			this.submitSuccess();
+			//console.log(action.result);
+			this.submitSuccess(action.result);
 		}
 		else {
 			this.submitError(action && action.result && action.result.msg || 'Error');

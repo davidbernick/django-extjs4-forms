@@ -62,6 +62,7 @@ def getFieldConfig(field_name, django_field, value = None):
 	
 	config['name'] = u'%s' % field_name
 	config['fieldLabel'] = u'%s' % (form_field and form_field.label or field_name)
+	config['afterSubTpl'] = u'%s' % form_field.help_text
 	if form_field:
 		config['allowBlank'] = not(form_field.required)
 		config['required'] = form_field.required
@@ -214,6 +215,7 @@ class ExtJsField(object):
 		self.config['fieldLabel'] = u'%s' % (django_field.label or field_name)
 		self.config['allowBlank'] = not(django_field.required)
 		self.config['invalidText'] = u'%s' % django_field.help_text or ''
+		self.config['afterBodyEl'] = u'%s' % django_field.help_text or ''
 		# init the value if any
 		self.config['value'] = ''
 		if django_field.initial:
