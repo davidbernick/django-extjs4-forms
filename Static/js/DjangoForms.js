@@ -37,7 +37,9 @@ Ext.define('Ext.ux.django.DjangoForm',{
 	,default_config:null
 	,showButtons:true
 	,showSuccessMessage:'Successful'
-
+	,listeners: {
+		specialkey: submitOnEnter
+	}
 	,initComponent:function() {
 		if (this.showButtons) {
 			this.buttons = [
@@ -897,5 +899,8 @@ Ext.define('Ext.ux.django.DateTime',{
 
 }); // eo extend
 
-// register xtype
-//Ext.reg('xdatetime', Ext.ux.form.DateTime);
+function submitOnEnter(field, event) {
+	if (event.getKey() == event.ENTER) {
+		field.up('form').getForm().submit();
+	}
+}
