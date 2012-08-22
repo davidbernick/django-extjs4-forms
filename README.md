@@ -80,6 +80,6 @@ These are things you should return instead of the usual render:
 
 JsonResponse(JSONserialise(RoleForm().as_extjsfields())) - spits out a form (RoleForm()) as extjs elements. Usually for rendering the form.
 
-JsonError(RoleForm(request.POST).html_errorlist()) - spits out the form with the errors built-in. This probably needs to be redone to spit out errors right into the window.
+JsonError(RoleForm(request.POST).html_errorlist()) - spits out the form with the errors built-in. 
 
 JsonResponse(JSONserialise({'success':True,'messages': [{'message':'OK'}]}) ) - success. 'messages' is ignored if you're overriding submitSuccess.
