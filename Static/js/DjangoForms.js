@@ -31,15 +31,19 @@ Ext.define('Ext.ux.django.DjangoForm',{
 	,baseParamsLoad:{'dataType':'json'}
 	,callback:null
 	,scope:null
-
 	,border:false
 	,custom_config:null
 	,default_config:null
 	,showButtons:true
 	,showSuccessMessage:'Successful'
 	,listeners: {
-		specialkey: submitOnEnter
-	}
+    		afterRender: function(thisForm, options){
+        		this.keyNav = Ext.create('Ext.util.KeyNav', this.el, {                    
+            			enter: this.submitForm,
+            			scope: this
+        		});
+    		}
+	}  
 	,initComponent:function() {
 		if (this.showButtons) {
 			this.buttons = [
@@ -900,7 +904,8 @@ Ext.define('Ext.ux.django.DateTime',{
 }); // eo extend
 
 function submitOnEnter(field, event) {
+	alert("TEST");
 	if (event.getKey() == event.ENTER) {
-		field.up('form').getForm().submit();
+		field.up('form').getForm().submitForm();
 	}
 }
